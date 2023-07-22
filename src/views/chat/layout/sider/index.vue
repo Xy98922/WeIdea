@@ -72,7 +72,8 @@ watch(
     <div class="flex flex-col h-full" :style="mobileSafeArea">
       <main class="flex flex-col flex-1 min-h-0">
         <div class="p-4">
-          <NButton dashed block @click="handleAdd">
+          <img src="https://tctp.webankcdn.net/owb-res/owb-res/assets/img/h5/webank-logo.png">
+          <NButton dashed block style="margin-top: 20px;" @click="handleAdd">
             {{ $t('chat.newChatButton') }}
           </NButton>
         </div>

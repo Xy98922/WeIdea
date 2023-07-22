@@ -143,3 +143,9 @@ async function handleCopy() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.w-full {
+  color: aliceblue;
+}
+</style>
