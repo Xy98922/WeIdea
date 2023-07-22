@@ -32,6 +32,7 @@ const { scrollRef, scrollToBottom, scrollToBottomIfAtBottom } = useScroll()
 const { usingContext, toggleUsingContext } = useUsingContext()
 
 const { uuid } = route.params as { uuid: string }
+const { promptTwo } = route.params as { promptTwo: string }
 
 const dataSources = computed(() => chatStore.getChatByUuid(+uuid))
 const conversationList = computed(() => dataSources.value.filter(item => (!item.inversion && !!item.conversationOptions)))
@@ -451,10 +452,14 @@ const footerClass = computed(() => {
   return classes
 })
 
-onMounted(() => {
+onMounted(async () => {
   scrollToBottom()
   if (inputRef.value && !isMobile.value)
     inputRef.value?.focus()
+  prompt.value = '从现在起，我是一个风险规避者，请以严肃的口吻回答我理财相关的问题，理财无关的问题请用“对不起，我无法回答理财无关问题”回复'
+  handleSubmit()
+  prompt.value = promptTwo
+  handleSubmit()
 })
 
 onUnmounted(() => {

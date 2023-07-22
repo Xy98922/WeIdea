@@ -65,9 +65,9 @@ export function fetchVerify<T>(token: string) {
   })
 }
 
-export function loginInfo<T>(token: string) {
+export function loginInfo<T>(account: string, password: string) {
   return post<T>({
     url: '/weidea/login',
-    data: { token },
+    data: { account, password },
   })
 }

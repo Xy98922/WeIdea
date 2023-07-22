@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import {
-  NButton, NButtonGroup, NCard, NCarousel, NCarouselItem, NForm,
-  NFormItemRow, NInput, NModal, NTabPane, NTabs,
+  NButton, NButtonGroup, NCard, NCarousel, NCarouselItem,
+  NForm, NFormItemRow, NInput, NModal, NTabPane, NTabs, useMessage,
 } from 'naive-ui'
 import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { loginInfo } from '@/api'
 const route = useRoute()
 const showSignModal = ref(false)
+const message = useMessage()
 const items = reactive([
   { title: '特斯拉公司(Tesla)', content: 'Model 3/Y交付量', src: 'public/微信图片_20230720201647.png' },
   { title: 'X5零售集团股份有限公司', content: '股票表现', src: 'public/微信图片_20230720204248.png' },
@@ -15,16 +16,45 @@ const items = reactive([
   { title: 'CPI地产集团(O5G)', content: '汽车总交付量', src: 'public/微信图片_20230720204303.png' },
 ])
 const detail = ref(false)
+const routerInfo = ref('大成互联网+大数据A基金的资产配置为：股票占比88.89%，现金7.35%，其他3.76%。重仓股票为：云南白药 (000538)占比40%，古井贡酒(000596)占比30%，汇川技术(300124)占比。该基金的资金和股票配置相对稳健，重仓的股票整体趋势良好，以下是对各股票的分析')
+const ifLogin = ref('')
+const options = [
+  {
+    label: '华夏成长混合A',
+    key: 'jay gatsby',
+  },
+  {
+    label: '农银新能源主题A',
+    key: 'daisy buchanan',
+  },
+  {
+    label: '前海开源裕和混合A',
+    key: 'daisy buchanan',
+  },
+  {
+    label: '浙商丰利增强债券',
+    key: 'daisy buchanan',
+  },
+]
+const showDetail = ref(false)
+const formValue = reactive({
+  userName: '',
+  userPassword: '',
+})
 async function handleLogin() {
   try {
-    console.log(await loginInfo('sss'))
+    ifLogin.value = '12345'
+    message.success(
+      '登录成功',
+      {
+        keepAliveOnHover: true,
+      },
+    )
+    await loginInfo(formValue.userName, formValue.userPassword)
   }
   catch (error: any) {
-
   }
-  finally {
-
-  }
+  finally { /* empty */ }
 }
 </script>
 
@@ -34,9 +64,14 @@ async function handleLogin() {
     <NTabs type="line" animated tab-style="color:white">
       <NTabPane name="oasis" tab="首页" style="color: aliceblue;" />
       <NTabPane name="jay chou" tab="产品">
-        <NCarousel show-arrow>
+        <div class="product-select">
+          <NButton v-for="item in options" :key="item.key" quaternary @click="showDetail = true">
+            {{ item.label }}
+          </NButton>
+        </div>
+        <NCarousel v-show="showDetail" show-arrow>
           <NCarouselItem v-for="item in items" :key="item.title">
-            <NCard :title="item.title">
+            <NCard :title="item.title" class="stocks">
               <template #cover>
                 <img :src="item.src">
               </template>
@@ -45,8 +80,8 @@ async function handleLogin() {
                 <NButton @click="detail = true">
                   查看智能分析
                 </NButton>
-                <NButton>
-                  <router-link to="/chat/:uuid?">
+                <NButton @click="handleAsk">
+                  <router-link :to="{ name: 'Chat', params: { promptTwo: routerInfo, uuid: 123 } }">
                     咨询
                   </router-link>
                 </NButton>
@@ -87,8 +122,8 @@ async function handleLogin() {
         </NCarousel>
       </NTabPane>
     </NTabs>
-    <NButton class="loginIn" type="primary" @click="showSignModal = true">
-      登录
+    <NButton class="loginIn" :type="ifLogin === '' ? 'primary' : 'quaternary'" @click="showSignModal = true">
+      {{ ifLogin === '' ? '登录' : ifLogin }}
     </NButton>
   </div>
   <div id="Nav" class="video-lvWKNq710v">
@@ -107,10 +142,11 @@ async function handleLogin() {
         <NTabPane name="signin" tab="登录">
           <NForm>
             <NFormItemRow label="用户名">
-              <NInput />
+              <NInput v-model:value="formValue.userName" placeholder="输入用户名" />
             </NFormItemRow>
             <NFormItemRow label="密码">
               <NInput
+                v-model:value="formValue.userPassword"
                 type="password"
                 show-password-on="mousedown"
               />
@@ -123,12 +159,13 @@ async function handleLogin() {
         <NTabPane name="signup" tab="注册">
           <NForm>
             <NFormItemRow label="用户名">
-              <NInput />
+              <NInput v-model:value="formValue.userName" placeholder="输入用户名" />
             </NFormItemRow>
             <NFormItemRow label="密码">
               <NInput
+                v-model:value="formValue.userPassword"
                 type="password"
-                show-password-on="mousedown"
+                show-password-on="mousedown" placeholder="输入密码"
               />
             </NFormItemRow>
             <NFormItemRow label="重复密码">
@@ -211,10 +248,11 @@ video{
 .signcard{
     width: 30%;
 }
-.n-card {
-  max-width: 850px;
-  margin-left: 15%;
+.stocks {
+  max-width: 650px;
+  margin-left: 25%;
 }
+
 .carousel-img {
   width: 100%;
   height: 240px;
@@ -222,5 +260,26 @@ video{
 }
 .n-button-group {
     float: right;
+}
+.product-select{
+  max-width: 350px;
+  float: left;
+}
+.product-select .n-button{
+  width: auto;
+  min-width: 150px;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 0%;
+  display: block;
+}
+.product-select .n-button:hover{
+  text-decoration: underline;
+}
+.product-select{
+    width: auto;
+    display: inline-block;
 }
   </style>
